@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GlobeTrotter — Smart Travel Planning & Destination Discovery</title>
+  <meta name="description" content="Discover global travel destinations, build custom day-by-day itineraries, calculate trip budgets, and match your dream travel vibe with GlobeTrotter.">
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌍</text></svg>">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="brand-logo">
+      <div class="compass-icon">🧭</div>
+      <span class="gradient-text">GlobeTrotter</span>
+    </div>
+
+    <nav>
+      <ul class="nav-links">
+        <li><a href="#" class="nav-link active" data-target="dashboard-section">Dashboard</a></li>
+        <li><a href="#" class="nav-link" data-target="mytrips-section" id="nav-mytrips-link" style="display:none;">My Trips</a></li>
+        <li><a href="#" class="nav-link" data-target="city-explorer-section">City Explorer</a></li>
+        <li><a href="#" class="nav-link" data-target="activity-discovery-section">Activities</a></li>
+        <li><a href="#" class="nav-link" data-target="trip-budget-section" id="nav-budget-link" style="display:none;">Budget Analytics</a></li>
+        <li><a href="#" class="nav-link" data-target="admin-section" id="nav-admin-link" style="display:none; color: var(--accent-gold);">⚡ Admin & Analytics</a></li>
+        <li><a href="#" class="nav-link" data-target="explore-section">Explore Spots</a></li>
+        <li><a href="#" class="nav-link" data-target="matcher-section">AI Trip Matcher</a></li>
+        <li><a href="#" class="nav-link" data-target="itinerary-section">Itinerary Planner</a></li>
+        <li><a href="#" class="nav-link" data-target="profile-section" id="nav-profile-link" style="display:none;">My Account</a></li>
+      </ul>
+    </nav>
+
+    <div class="nav-actions">
+      <div class="status-pill">
+        <span class="status-dot"></span>
+        <span id="api-status-text">API Online</span>
+      </div>
+
+      <!-- Guest State Buttons -->
+      <div id="guest-nav-actions" style="display: flex; gap: 0.75rem;">
+        <button class="btn btn-glass btn-sm" id="open-login-btn">Sign In</button>
+        <button class="btn btn-primary btn-sm" id="open-register-btn">Register</button>
+      </div>
+
+      <!-- Logged In User State -->
+      <div id="user-nav-actions" style="display: none; align-items: center; gap: 0.75rem;">
+        <button class="user-menu-btn" id="user-profile-trigger">
+          <div class="avatar-circle" id="user-avatar-initials">U</div>
+          <span id="user-nav-name" style="font-weight: 600; font-size: 0.9rem;">User</span>
+        </button>
+        <button class="btn btn-glass btn-sm" id="logout-btn" title="Sign Out">🚪 Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-badge">✨ Powered by GlobeTrotter Backend API v1.0</div>
+    <h1 class="hero-title">Explore the World, Plan Smart,<br><span class="gradient-text">Travel Without Limits</span></h1>
+    <p class="hero-subtitle">Discover breathtaking destinations, generate custom itineraries, calculate travel budgets, and connect with your next big adventure.</p>
+
+    <!-- Search Box -->
+    <div class="search-card">
+      <div class="search-inputs">
+        <div class="input-group">
+          <label>Search Destination</label>
+          <input type="text" id="search-query" class="custom-input" placeholder="e.g. Kyoto, Santorini, Banff, Bali...">
+        </div>
+        <div class="input-group">
+          <label>Region</label>
+          <select id="filter-region" class="custom-input">
+            <option value="all">All Regions</option>
+            <option value="Asia">Asia</option>
+            <option value="Europe">Europe</option>
+            <option value="Americas">Americas</option>
+            <option value="Africa">Africa</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label>Vibe</label>
+          <select id="filter-vibe" class="custom-input">
+            <option value="all">All Styles</option>
+            <option value="Culture">Culture & History</option>
+            <option value="Tropical">Tropical Beach</option>
+            <option value="Alpine">Mountains & Nature</option>
+            <option value="Luxury">Luxury Resort</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" id="search-btn" style="height: 48px; margin-top: 1.25rem;">
+          🔍 Search
+        </button>
+      </div>
+
+      <div class="filter-tags">
+        <button class="filter-tag active" data-category="all">✨ All Destinations</button>
+        <button class="filter-tag" data-category="Popular">🔥 Trending</button>
+        <button class="filter-tag" data-category="Tropical">🏝️ Tropical</button>
+        <button class="filter-tag" data-category="Culture">⛩️ Heritage</button>
+        <button class="filter-tag" data-category="Alpine">🏔️ Alpine</button>
+        <button class="filter-tag" data-category="Budget">💰 Budget Friendly</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content Area -->
+  <main class="main-container">
+
+    <!-- SECTION 0: Dashboard / Home Screen -->
+    <section id="dashboard-section" class="tab-content active">
+      <div style="background: linear-gradient(135deg, rgba(114, 9, 183, 0.2), rgba(0, 245, 212, 0.15)); border: 1px solid var(--border-glass-glow); border-radius: var(--radius-lg); padding: 2rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
+        <div>
+          <span class="hero-badge" style="margin-bottom: 0.5rem;">👋 Welcome Back</span>
+          <h2 class="section-title" id="dash-welcome-heading" style="font-size: 2.2rem;">Welcome to GlobeTrotter! ✨</h2>
+          <p style="color: var(--text-muted); margin-top: 0.25rem;">Track your upcoming adventures, manage travel budgets, and discover handpicked global destinations.</p>
+        </div>
+        <button class="btn btn-primary" id="dash-quick-plan-btn" style="height: 50px; font-size: 1.05rem;">
+          ✨ Plan New Trip
+        </button>
+      </div>
+
+      <!-- Quick Statistics Cards -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;">
+        <div class="dest-card" style="padding: 1.5rem; display: flex; align-items: center; gap: 1.25rem;">
+          <div style="width: 54px; height: 54px; border-radius: var(--radius-md); background: rgba(0, 245, 212, 0.15); border: 1px solid var(--primary-cyan); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: var(--primary-cyan);">
+            ✈️
+          </div>
+          <div>
+            <span style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Total Trips</span>
+            <h3 id="dash-stat-trips" style="font-size: 1.8rem; font-weight: 800; color: var(--text-main);">0 Trips</h3>
+          </div>
+        </div>
+
+        <div class="dest-card" style="padding: 1.5rem; display: flex; align-items: center; gap: 1.25rem;">
+          <div style="width: 54px; height: 54px; border-radius: var(--radius-md); background: rgba(255, 190, 11, 0.15); border: 1px solid var(--accent-gold); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: var(--accent-gold);">
+            💰
+          </div>
+          <div>
+            <span style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Total Budget Spent</span>
+            <h3 id="dash-stat-budget" style="font-size: 1.8rem; font-weight: 800; color: var(--primary-cyan);">$0</h3>
+          </div>
+        </div>
+
+        <div class="dest-card" style="padding: 1.5rem; display: flex; align-items: center; gap: 1.25rem;">
+          <div style="width: 54px; height: 54px; border-radius: var(--radius-md); background: rgba(255, 0, 110, 0.15); border: 1px solid var(--accent-pink); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: var(--accent-pink);">
+            🗓️
+          </div>
+          <div>
+            <span style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Upcoming Trips</span>
+            <h3 id="dash-stat-upcoming" style="font-size: 1.8rem; font-weight: 800; color: var(--text-main);">0 Upcoming</h3>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Trips Carousel / Grid -->
+      <div style="margin-bottom: 3.5rem;">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">My Recent Trips</h2>
+            <p class="section-subtitle">Your latest travel plans and itineraries.</p>
+          </div>
+        </div>
+        <div class="cards-grid" id="recent-trips-grid">
+          <!-- Recent trip cards injected dynamically -->
+        </div>
+      </div>
+
+      <!-- Recommended Global Destinations & Popular Activity Highlights -->
+      <div>
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Recommended Destinations & Highlights</h2>
+            <p class="section-subtitle">Top-rated spots complete with popular activities and estimated costs.</p>
+          </div>
+        </div>
+        <div class="cards-grid" id="recommended-destinations-grid">
+          <!-- Recommended destination cards injected dynamically -->
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 0.5: My Trips (Trip List Screen) -->
+    <section id="mytrips-section" class="tab-content hidden">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">My Travel Plans</h2>
+          <p class="section-subtitle">Search, filter, edit, share, and manage all your upcoming and past trips.</p>
+        </div>
+        <button class="btn btn-primary" id="open-trip-wizard-btn">+ Create Trip Wizard</button>
+      </div>
+
+      <!-- Search & Filter Controls -->
+      <div class="search-card" style="margin-bottom: 2rem; padding: 1.25rem;">
+        <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+          <div style="flex-grow: 1; min-width: 260px;">
+            <input type="text" id="mytrips-search-input" class="custom-input" placeholder="🔍 Search by trip name, destination, or description...">
+          </div>
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;" id="mytrips-status-tags">
+            <button class="filter-tag active" data-status="all">All Trips</button>
+            <button class="filter-tag" data-status="upcoming">🗓️ Upcoming</button>
+            <button class="filter-tag" data-status="ongoing">🚀 Ongoing</button>
+            <button class="filter-tag" data-status="completed">✅ Completed</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trips Grid -->
+      <div class="cards-grid" id="mytrips-grid">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+
+    <!-- SECTION 0.75: City Search & Explorer -->
+    <section id="city-explorer-section" class="tab-content hidden">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">City Search & Explorer</h2>
+          <p class="section-subtitle">Real-time filtering by country, region, and cost index. Instantly add cities to your trip.</p>
+        </div>
+      </div>
+
+      <!-- City Search & Filter Bar -->
+      <div class="search-card" style="margin-bottom: 2rem; padding: 1.25rem;">
+        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1rem; align-items: center;">
+          <div class="input-group">
+            <label>Search City or Country</label>
+            <input type="text" id="city-search-input" class="custom-input" placeholder="e.g. Kyoto, Paris, Tokyo, Venice...">
+          </div>
+          <div class="input-group">
+            <label>Region</label>
+            <select id="city-filter-region" class="custom-input">
+              <option value="all">All Regions</option>
+              <option value="Europe">Europe</option>
+              <option value="Asia">Asia</option>
+              <option value="Americas">Americas</option>
+              <option value="Africa">Africa</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label>Cost Index</label>
+            <select id="city-filter-cost" class="custom-input">
+              <option value="all">All Budget Levels</option>
+              <option value="$">$ (Budget)</option>
+              <option value="$$">$$ (Moderate)</option>
+              <option value="$$$">$$$ (Comfort)</option>
+              <option value="$$$$">$$$$ (Luxury)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cities Grid -->
+      <div class="cards-grid" id="cities-grid">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+
+    <!-- SECTION 0.8: Activity Search & Discovery Screen -->
+    <section id="activity-discovery-section" class="tab-content hidden">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Activity Search & Discovery</h2>
+          <p class="section-subtitle">Filter global activities by category, cost range, and duration. Preview details & assign to trips.</p>
+        </div>
+      </div>
+
+      <!-- Activity Filters Bar -->
+      <div class="search-card" style="margin-bottom: 2rem; padding: 1.25rem;">
+        <div style="display: grid; grid-template-columns: 2fr 1.5fr 1fr 1fr; gap: 1rem; align-items: center;">
+          <div class="input-group">
+            <label>Search Activity or Location</label>
+            <input type="text" id="act-search-input" class="custom-input" placeholder="e.g. Louvre, Shrine, Sushi, Gondola...">
+          </div>
+          <div class="input-group">
+            <label>Category</label>
+            <select id="act-filter-category" class="custom-input">
+              <option value="all">All Categories</option>
+              <option value="Sightseeing">👁️ Sightseeing</option>
+              <option value="Food">🍱 Food & Dining</option>
+              <option value="Adventure">🧗 Adventure</option>
+              <option value="Culture">⛩️ Culture & History</option>
+              <option value="Transport">🚄 Transport</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label>Max Cost ($<span id="act-cost-val">300</span>)</label>
+            <input type="range" id="act-filter-cost-range" min="0" max="300" step="10" value="300" style="width: 100%; accent-color: var(--primary-cyan);">
+          </div>
+          <div class="input-group">
+            <label>Duration</label>
+            <select id="act-filter-duration" class="custom-input">
+              <option value="all">Any Duration</option>
+              <option value="1 hour">Quick (1h)</option>
+              <option value="2">Half Day (2-4h)</option>
+              <option value="Full day">Full Day</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Activities Catalog Grid -->
+      <div class="cards-grid" id="activities-catalog-grid">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+
+    <!-- SECTION 0.9: Trip Budget & Cost Breakdown Screen -->
+    <section id="trip-budget-section" class="tab-content hidden">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Financial Analytics & Budget Breakdown</h2>
+          <p class="section-subtitle">Interactive expense breakdown, daily average calculations, and Smart Budget Alerts.</p>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+          <select id="budget-trip-picker" class="custom-input" style="height: 40px; padding: 0 1rem;">
+            <!-- Trip options injected dynamically -->
+          </select>
+        </div>
+      </div>
+
+      <!-- Smart Budget Alerts Container -->
+      <div id="budget-alerts-container" style="margin-bottom: 1.5rem;">
+        <!-- Injected dynamically -->
+      </div>
+
+      <!-- Summary Stat Widgets -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem; margin-bottom: 2rem;">
+        <div class="dest-card" style="padding: 1.25rem;">
+          <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Target Budget</span>
+          <h3 id="analytics-target-budget" style="font-size: 1.6rem; font-weight: 800; color: white; margin-top: 0.25rem;">$0</h3>
+        </div>
+        <div class="dest-card" style="padding: 1.25rem;">
+          <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Total Spent</span>
+          <h3 id="analytics-total-spent" style="font-size: 1.6rem; font-weight: 800; color: var(--primary-cyan); margin-top: 0.25rem;">$0</h3>
+        </div>
+        <div class="dest-card" style="padding: 1.25rem;">
+          <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Remaining Budget</span>
+          <h3 id="analytics-remaining-budget" style="font-size: 1.6rem; font-weight: 800; color: var(--accent-gold); margin-top: 0.25rem;">$0</h3>
+        </div>
+        <div class="dest-card" style="padding: 1.25rem;">
+          <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Daily Avg Expenditure</span>
+          <h3 id="analytics-daily-avg" style="font-size: 1.6rem; font-weight: 800; color: var(--accent-pink); margin-top: 0.25rem;">$0 / day</h3>
+        </div>
+      </div>
+
+      <!-- Financial Category Breakdown Bars & Add Expense Form Grid -->
+      <div style="display: grid; grid-template-columns: 1fr 340px; gap: 2rem;">
+        <!-- Expense Breakdown Charts -->
+        <div style="background: var(--bg-card); border: 1px solid var(--border-glass); border-radius: var(--radius-lg); padding: 1.5rem;">
+          <h3 style="font-size: 1.25rem; margin-bottom: 1.25rem;">📊 Expense Breakdown by Category</h3>
+          <div id="category-breakdown-bars" style="display: flex; flex-direction: column; gap: 1.25rem;">
+            <!-- Progress bars rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- Add Expense Form -->
+        <div style="background: var(--bg-card); border: 1px solid var(--border-glass); border-radius: var(--radius-lg); padding: 1.5rem;">
+          <h3 style="font-size: 1.2rem; margin-bottom: 1rem;">💳 Log New Expense</h3>
+          <form id="add-expense-form" style="display: flex; flex-direction: column; gap: 0.85rem;">
+            <div class="input-group">
+              <label>Category</label>
+              <select id="exp-category" class="custom-input" required>
+                <option value="Transport">🚄 Transport</option>
+                <option value="Accommodation">🏨 Accommodation</option>
+                <option value="Food/Dining">🍱 Food / Dining</option>
+                <option value="Activities">🎟️ Activities</option>
+                <option value="Other">🛍️ Other</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label>Amount ($)</label>
+              <input type="number" id="exp-amount" class="custom-input" placeholder="75" min="1" step="any" required>
+            </div>
+            <div class="input-group">
+              <label>Day Number</label>
+              <input type="number" id="exp-day" class="custom-input" value="1" min="1" required>
+            </div>
+            <div class="input-group">
+              <label>Description / Notes</label>
+              <input type="text" id="exp-description" class="custom-input" placeholder="e.g. Shinkansen Bullet Train">
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="margin-top: 0.5rem; width: 100%;">Add Expense Line Item 💳</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 1: Destination Explorer Grid -->
+    <section id="explore-section" class="tab-content hidden">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Top Curated Destinations</h2>
+          <p class="section-subtitle">Handpicked global spots complete with daily activity breakdowns & costs.</p>
+        </div>
+        <div class="status-pill badge-purple">
+          Showing <span id="destination-count">8</span> Spots
+        </div>
+      </div>
+
+      <div class="cards-grid" id="destinations-grid">
+        <!-- Destination Cards render dynamically here -->
+      </div>
+    </section>
+
+    <!-- SECTION 2: AI Trip Matcher Quiz -->
+    <section id="matcher-section" class="tab-content hidden">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">AI Destination Matcher</h2>
+          <p class="section-subtitle">Answer 3 quick questions to discover your ideal travel destination.</p>
+        </div>
+      </div>
+
+      <div class="quiz-card">
+        <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;" id="quiz-question-title">Step 1: What type of environment calls to you?</h3>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;" id="quiz-question-sub">Select your dream vibe for your upcoming trip.</p>
+
+        <div class="quiz-steps" id="quiz-options-container">
+          <!-- Quiz options injected via JS -->
+        </div>
+
+        <div style="display: flex; justify-content: center; gap: 1rem; margin-top: 1rem;">
+          <button class="btn btn-glass" id="quiz-prev-btn" style="display: none;">← Back</button>
+          <button class="btn btn-accent" id="quiz-next-btn">Next Step →</button>
+        </div>
+      </div>
+
+      <div id="quiz-results-container" class="hidden" style="margin-top: 2.5rem;">
+        <h3 style="font-size: 1.8rem; text-align: center; margin-bottom: 1.5rem;">🎉 Your Top Matched Destinations</h3>
+        <div class="cards-grid" id="quiz-results-grid"></div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: Itinerary Planner -->
+    <section id="itinerary-section" class="tab-content hidden">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Interactive Trip Itinerary Builder</h2>
+          <p class="section-subtitle">Manage multi-stop city orders, assign activity time blocks, and switch view modes.</p>
+        </div>
+        
+        <!-- Multi-View Mode Toggle Buttons -->
+        <div style="display: flex; gap: 0.5rem; background: var(--bg-card); padding: 0.35rem; border-radius: var(--radius-md); border: 1px solid var(--border-glass);">
+          <button class="btn btn-glass btn-sm active" id="view-mode-timeline" style="border: none;">📍 Timeline View</button>
+          <button class="btn btn-glass btn-sm" id="view-mode-calendar" style="border: none;">🗓️ Calendar View</button>
+          <button class="btn btn-glass btn-sm" id="view-mode-list" style="border: none;">📄 Detailed List</button>
+        </div>
+      </div>
+
+      <!-- Multi-Stop City Rank Manager -->
+      <div style="background: var(--bg-card); border: 1px solid var(--border-glass); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <div>
+            <h3 style="font-size: 1.25rem;">📍 Multi-Stop City Manager</h3>
+            <p style="color: var(--text-muted); font-size: 0.85rem;">Reorder city stop rank order or adjust stay durations.</p>
+          </div>
+          <button class="btn btn-primary btn-sm" id="open-add-stop-modal-btn">+ Add City Stop</button>
+        </div>
+        <div id="city-stops-rank-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <!-- Stop items rendered dynamically with rank up/down buttons -->
+        </div>
+      </div>
+
+      <div class="itinerary-container">
+        <div class="itinerary-main">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-glass); padding-bottom: 1rem;">
+            <div>
+              <h3 id="trip-title" style="font-size: 1.4rem;">🇯🇵 7 Days in Kyoto & Tokyo</h3>
+              <p id="trip-dates" style="color: var(--text-muted); font-size: 0.85rem;">Cultural Heritage & Modern Marvels</p>
+            </div>
+            <button class="btn btn-glass btn-sm" id="add-activity-btn">+ Assign Activity</button>
+          </div>
+
+          <!-- View Mode 1: Timeline View -->
+          <div id="itinerary-timeline-view" class="itinerary-view-panel">
+            <div class="day-timeline" id="timeline-list">
+              <!-- Timeline items rendered dynamically -->
+            </div>
+          </div>
+
+          <!-- View Mode 2: Calendar View -->
+          <div id="itinerary-calendar-view" class="itinerary-view-panel hidden">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;" id="calendar-grid-list">
+              <!-- Calendar day cards rendered dynamically -->
+            </div>
+          </div>
+
+          <!-- View Mode 3: Detailed List View -->
+          <div id="itinerary-list-view" class="itinerary-view-panel hidden">
+            <div id="detailed-list-table-container">
+              <!-- Detailed list breakdown rendered dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <div class="budget-widget">
+          <h3 style="font-size: 1.2rem; margin-bottom: 1rem;">💰 Estimated Trip Budget</h3>
+          <div style="display: flex; flex-direction: column; gap: 0.8rem; font-size: 0.9rem; margin-bottom: 1.5rem;">
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: var(--text-muted);">🏨 Accommodation:</span>
+              <strong id="cost-hotel">$840</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: var(--text-muted);">🍱 Food & Dining:</span>
+              <strong id="cost-food">$450</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: var(--text-muted);">🎟️ Tours & Tickets:</span>
+              <strong id="cost-tours">$280</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: var(--text-muted);">✈️ Flights / Transport:</span>
+              <strong id="cost-transport">$650</strong>
+            </div>
+            <div style="border-top: 1px solid var(--border-glass); padding-top: 0.8rem; display: flex; justify-content: space-between; font-size: 1.1rem;">
+              <span>Total Budget:</span>
+              <strong id="cost-total" style="color: var(--primary-cyan); font-size: 1.3rem;">$2,220</strong>
+            </div>
+          </div>
+          <button class="btn btn-accent" style="width: 100%;" id="save-itinerary-btn">💾 Save to My Account</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3.5: Shared / Public Itinerary View Screen -->
+    <section id="public-share-section" class="tab-content hidden">
+      <!-- Public Hero Banner -->
+      <div id="public-share-hero" style="background: var(--bg-card); border: 1px solid var(--border-glass-glow); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 2rem;">
+        <div style="height: 240px; position: relative;">
+          <img id="public-share-cover" src="https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99" alt="Cover" style="width: 100%; height: 100%; object-fit: cover;">
+          <div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(7,10,19,0.3) 0%, rgba(7,10,19,0.95) 100%);"></div>
+          <div style="position: absolute; bottom: 1.5rem; left: 1.5rem; right: 1.5rem; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem;">
+            <div>
+              <span class="status-pill badge-gold" id="public-share-owner">👤 Shared by Explorer</span>
+              <h1 style="font-size: 2.2rem; color: white; margin: 0.35rem 0 0.15rem;" id="public-share-title">Swiss Alps Railway Escape</h1>
+              <p style="color: var(--text-muted); font-size: 0.9rem;" id="public-share-subtitle">📍 Zermatt, Switzerland • 🗓️ Nov 1 - Nov 7, 2026</p>
+            </div>
+
+            <!-- Public Action Buttons -->
+            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+              <button class="btn btn-accent" id="clone-public-trip-btn">📋 Copy Trip to My Account</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Social Sharing Bar -->
+        <div style="background: rgba(7, 10, 19, 0.7); border-top: 1px solid var(--border-glass); padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+          <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">Share Itinerary with Friends:</span>
+          <div style="display: flex; gap: 0.75rem;">
+            <a href="#" id="share-twitter-btn" target="_blank" class="btn btn-glass btn-sm" style="color: #1da1f2; border-color: rgba(29,161,242,0.3);">🐦 Twitter / X</a>
+            <a href="#" id="share-whatsapp-btn" target="_blank" class="btn btn-glass btn-sm" style="color: #25d366; border-color: rgba(37,211,102,0.3);">💬 WhatsApp</a>
+            <button class="btn btn-glass btn-sm" id="share-copy-link-btn">🔗 Copy Public Link</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Public Itinerary Content Breakdown -->
+      <div style="display: grid; grid-template-columns: 1fr 340px; gap: 2rem;">
+        <div>
+          <h3 style="font-size: 1.3rem; margin-bottom: 1rem;">📍 Planned City Stops</h3>
+          <div id="public-stops-list" style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 2.5rem;">
+            <!-- Public stops injected dynamically -->
+          </div>
+
+          <h3 style="font-size: 1.3rem; margin-bottom: 1rem;">🎟️ Daily Activity Timeline</h3>
+          <div class="day-timeline" id="public-activities-timeline">
+            <!-- Public activities injected dynamically -->
+          </div>
+        </div>
+
+        <div>
+          <div class="dest-card" style="padding: 1.5rem;">
+            <h3 style="font-size: 1.15rem; margin-bottom: 1rem;">💰 Estimated Total Budget</h3>
+            <div style="font-size: 2.2rem; font-weight: 800; color: var(--primary-cyan); margin-bottom: 0.5rem;" id="public-share-budget">$3,200</div>
+            <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">Includes total target budget plus all scheduled activity ticket costs.</p>
+
+            <button class="btn btn-primary" style="width: 100%; margin-top: 1.5rem;" id="public-clone-sidebar-btn">✨ Copy Trip to My Account</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 4: User Profile & Account -->
+    <section id="profile-section" class="tab-content hidden">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">My Account & Settings</h2>
+          <p class="section-subtitle">Manage your GlobeTrotter profile, preferences, wishlist, and account security.</p>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 320px 1fr; gap: 2rem;">
+        <!-- User Bio Card -->
+        <div class="dest-card" style="padding: 2rem; text-align: center;">
+          <div class="avatar-circle" id="profile-avatar-large" style="width: 80px; height: 80px; font-size: 2.2rem; margin: 0 auto 1rem;">U</div>
+          <h3 id="profile-name-display" style="font-size: 1.4rem;">User Name</h3>
+          <p id="profile-email-display" style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.5rem;">user@example.com</p>
+          <span class="status-pill badge-gold" id="profile-role-badge">GlobeTrotter Explorer</span>
+          
+          <div style="margin-top: 1.5rem; border-top: 1px solid var(--border-glass); padding-top: 1rem; text-align: left;">
+            <label style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase;">About Me</label>
+            <p id="profile-bio-display" style="font-size: 0.9rem; color: var(--text-muted); margin-top: 0.25rem;">No bio set yet.</p>
+          </div>
+
+          <div style="margin-top: 1rem; border-top: 1px solid var(--border-glass); padding-top: 1rem; text-align: left;">
+            <label style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase;">Preferences</label>
+            <div style="display: flex; gap: 0.5rem; margin-top: 0.35rem;">
+              <span class="status-pill badge-purple" id="pref-currency-pill">💵 USD ($)</span>
+              <span class="status-pill badge-cyan" id="pref-language-pill">🌐 English</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Edit Forms & Settings -->
+        <div class="itinerary-main">
+          <h3 style="font-size: 1.25rem; margin-bottom: 1rem;">✏️ Update Profile & Preferences</h3>
+          <form id="profile-update-form" style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2.5rem;">
+            <div class="input-group">
+              <label>Full Name</label>
+              <input type="text" id="update-name-input" class="custom-input" required>
+            </div>
+            <div class="input-group">
+              <label>Bio / Travel Goals</label>
+              <textarea id="update-bio-input" class="custom-input" rows="2" placeholder="Tell fellow travelers where you love to explore..."></textarea>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+              <div class="input-group">
+                <label>Currency Preference</label>
+                <select id="update-currency-input" class="custom-input">
+                  <option value="USD">USD ($)</option>
+                  <option value="EUR">EUR (€)</option>
+                  <option value="GBP">GBP (£)</option>
+                  <option value="JPY">JPY (¥)</option>
+                  <option value="CAD">CAD ($)</option>
+                  <option value="AUD">AUD ($)</option>
+                </select>
+              </div>
+              <div class="input-group">
+                <label>Language Preference</label>
+                <select id="update-language-input" class="custom-input">
+                  <option value="en">English</option>
+                  <option value="es">Spanish (Español)</option>
+                  <option value="fr">French (Français)</option>
+                  <option value="de">German (Deutsch)</option>
+                  <option value="ja">Japanese (日本語)</option>
+                </select>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="align-self: flex-start;">Save Settings & Preferences 💾</button>
+          </form>
+
+          <!-- Saved Destinations Wishlist -->
+          <h3 style="font-size: 1.25rem; margin-bottom: 1rem; border-top: 1px solid var(--border-glass); padding-top: 1.5rem;">❤️ Saved Destinations Wishlist</h3>
+          <div id="wishlist-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 2.5rem;">
+            <!-- Wishlist cards dynamically rendered -->
+          </div>
+
+          <!-- Security & Account Management -->
+          <h3 style="font-size: 1.25rem; margin-bottom: 1rem; border-top: 1px solid var(--border-glass); padding-top: 1.5rem;">🔑 Security & Password</h3>
+          <form id="change-password-form" style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2.5rem;">
+            <div class="input-group">
+              <label>Current Password</label>
+              <input type="password" id="current-pass-input" class="custom-input" required>
+            </div>
+            <div class="input-group">
+              <label>New Password</label>
+              <input type="password" id="new-pass-input" class="custom-input" minlength="6" required>
+            </div>
+            <button type="submit" class="btn btn-glass" style="align-self: flex-start;">Update Password</button>
+          </form>
+
+          <h3 style="font-size: 1.25rem; color: var(--accent-pink); margin-bottom: 1rem; border-top: 1px solid var(--border-glass); padding-top: 1.5rem;">⚠️ Account Management Actions</h3>
+          <div style="background: rgba(255, 0, 110, 0.1); border: 1px solid var(--accent-pink); border-radius: var(--radius-md); padding: 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <div>
+              <strong style="color: white;">Delete GlobeTrotter Account</strong>
+              <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.15rem;">Permanently remove your profile and all associated trip plans. This action cannot be undone.</p>
+            </div>
+            <button class="btn btn-danger" id="delete-account-btn">Delete My Account</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 5: Admin & Analytics Dashboard -->
+    <section id="admin-section" class="tab-content hidden">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">⚡ Platform Admin & Analytics</h2>
+          <p class="section-subtitle">Real-time statistics, platform usage insights, and content & user management.</p>
+        </div>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="dash-stats" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 2rem;">
+        <div class="stat-card">
+          <div class="stat-icon">👥</div>
+          <div class="stat-value" id="admin-stat-users">0</div>
+          <div class="stat-label">Total Users</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">✈️</div>
+          <div class="stat-value" id="admin-stat-trips">0</div>
+          <div class="stat-label">Trips Created</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📍</div>
+          <div class="stat-value" id="admin-stat-stops">0</div>
+          <div class="stat-label">City Stops</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🎟️</div>
+          <div class="stat-value" id="admin-stat-activities">0</div>
+          <div class="stat-label">Scheduled Activities</div>
+        </div>
+      </div>
+
+      <!-- Analytics Breakdown -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2.5rem;">
+        <div class="dest-card" style="padding: 1.5rem;">
+          <h3 style="font-size: 1.15rem; margin-bottom: 1rem;">🔥 Most Popular Trip Destinations</h3>
+          <div id="admin-popular-destinations-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <!-- Popular destinations injected dynamically -->
+          </div>
+        </div>
+
+        <div class="dest-card" style="padding: 1.5rem;">
+          <h3 style="font-size: 1.15rem; margin-bottom: 1rem;">📊 Top Activity Categories</h3>
+          <div id="admin-activity-categories-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <!-- Activity categories injected dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <!-- User Management Table -->
+      <h3 style="font-size: 1.3rem; margin-bottom: 1rem;">👥 Platform User Management</h3>
+      <div style="background: rgba(7, 10, 19, 0.6); border: 1px solid var(--border-glass); border-radius: var(--radius-md); overflow: hidden;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
+          <thead>
+            <tr style="background: rgba(0, 245, 212, 0.1); color: var(--primary-cyan); border-bottom: 1px solid var(--border-glass);">
+              <th style="padding: 0.85rem 1rem;">ID</th>
+              <th style="padding: 0.85rem 1rem;">User</th>
+              <th style="padding: 0.85rem 1rem;">Email</th>
+              <th style="padding: 0.85rem 1rem;">Role</th>
+              <th style="padding: 0.85rem 1rem;">Joined Date</th>
+              <th style="padding: 0.85rem 1rem;">Admin Action</th>
+            </tr>
+          </thead>
+          <tbody id="admin-users-table-body">
+            <!-- User table rows injected dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- LOGIN MODAL -->
+  <div class="modal-overlay" id="login-modal">
+    <div class="modal-card">
+      <button class="modal-close" class="close-modal-btn">&times;</button>
+      <h2 style="font-size: 1.8rem; margin-bottom: 0.25rem;">Welcome Back! ✈️</h2>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">Sign in to access saved trips and personalized recommendations.</p>
+
+      <form id="login-form" style="display: flex; flex-direction: column; gap: 1rem;">
+        <div class="input-group">
+          <label>Email Address</label>
+          <input type="email" id="login-email" class="custom-input" placeholder="traveler@globetrotter.com" required>
+        </div>
+        <div class="input-group">
+          <label>Password</label>
+          <input type="password" id="login-password" class="custom-input" placeholder="••••••••" required>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem;">
+          <a href="#" id="forgot-password-link" style="color: var(--primary-cyan);">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="margin-top: 0.5rem; width: 100%;">Sign In</button>
+      </form>
+
+      <p style="text-align: center; margin-top: 1.25rem; font-size: 0.85rem; color: var(--text-muted);">
+        Don't have an account? <a href="#" id="switch-to-register" style="color: var(--primary-cyan); font-weight: 600;">Register Now</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- REGISTER MODAL -->
+  <div class="modal-overlay" id="register-modal">
+    <div class="modal-card">
+      <button class="modal-close" class="close-modal-btn">&times;</button>
+      <h2 style="font-size: 1.8rem; margin-bottom: 0.25rem;">Create Your Account 🧭</h2>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">Join GlobeTrotter to unlock full itinerary saving features.</p>
+
+      <form id="register-form" style="display: flex; flex-direction: column; gap: 1rem;">
+        <div class="input-group">
+          <label>Full Name</label>
+          <input type="text" id="reg-name" class="custom-input" placeholder="e.g. Alex Morgan" required>
+        </div>
+        <div class="input-group">
+          <label>Email Address</label>
+          <input type="email" id="reg-email" class="custom-input" placeholder="alex@globetrotter.com" required>
+        </div>
+        <div class="input-group">
+          <label>Password (Min. 6 chars)</label>
+          <input type="password" id="reg-password" class="custom-input" placeholder="••••••••" minlength="6" required>
+        </div>
+        <div class="input-group">
+          <label>Short Bio (Optional)</label>
+          <input type="text" id="reg-bio" class="custom-input" placeholder="e.g. Backpacking across South America">
+        </div>
+
+        <button type="submit" class="btn btn-accent" style="margin-top: 0.5rem; width: 100%;">Create Account</button>
+      </form>
+
+      <p style="text-align: center; margin-top: 1.25rem; font-size: 0.85rem; color: var(--text-muted);">
+        Already have an account? <a href="#" id="switch-to-login" style="color: var(--primary-cyan); font-weight: 600;">Sign In</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- FORGOT PASSWORD MODAL -->
+  <div class="modal-overlay" id="forgot-modal">
+    <div class="modal-card">
+      <button class="modal-close" class="close-modal-btn">&times;</button>
+      <h2 style="font-size: 1.6rem; margin-bottom: 0.25rem;">Reset Password</h2>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">Enter your email to request a reset token from backend.</p>
+
+      <form id="forgot-form" style="display: flex; flex-direction: column; gap: 1rem;">
+        <div class="input-group">
+          <label>Email Address</label>
+          <input type="email" id="forgot-email" class="custom-input" placeholder="your@email.com" required>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Generate Reset Token</button>
+      </form>
+
+      <div id="reset-token-display" class="hidden" style="margin-top: 1.5rem; background: rgba(0, 245, 212, 0.1); border: 1px dashed var(--primary-cyan); padding: 1rem; border-radius: var(--radius-md);">
+        <p style="font-size: 0.8rem; color: var(--primary-cyan); font-weight: 600;">Generated Reset Token (Testing Mode):</p>
+        <code id="reset-token-code" style="font-size: 0.95rem; font-weight: 700; color: white; display: block; margin: 0.5rem 0;">token_code</code>
+        <button class="btn btn-glass btn-sm" id="use-reset-token-btn" style="width: 100%;">Use Token Now</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESET PASSWORD MODAL -->
+  <div class="modal-overlay" id="reset-modal">
+    <div class="modal-card">
+      <button class="modal-close" class="close-modal-btn">&times;</button>
+      <h2 style="font-size: 1.6rem; margin-bottom: 0.25rem;">Enter New Password</h2>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">Provide your reset token and new password.</p>
+
+      <form id="reset-form" style="display: flex; flex-direction: column; gap: 1rem;">
+        <div class="input-group">
+          <label>Reset Token</label>
+          <input type="text" id="reset-token-input" class="custom-input" placeholder="Token" required>
+        </div>
+        <div class="input-group">
+          <label>New Password</label>
+          <input type="password" id="reset-new-password" class="custom-input" placeholder="••••••••" minlength="6" required>
+        </div>
+        <button type="submit" class="btn btn-accent" style="width: 100%;">Confirm New Password</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- PLAN NEW TRIP MODAL -->
+  <div class="modal-overlay" id="plan-trip-modal">
+    <div class="modal-card">
+      <button class="modal-close" class="close-modal-btn">&times;</button>
+      <h2 style="font-size: 1.8rem; margin-bottom: 0.25rem;">✨ Plan New Trip</h2>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">Quickly launch a new trip plan and calculate your budget.</p>
+
+      <form id="plan-trip-form" style="display: flex; flex-direction: column; gap: 1rem;">
+        <div class="input-group">
+          <label>Destination Title</label>
+          <input type="text" id="trip-dest-title" class="custom-input" placeholder="e.g. Kyoto Cultural Sanctuary" required>
+        </div>
+        <div class="input-group">
+          <label>Location / Country</label>
+          <input type="text" id="trip-dest-location" class="custom-input" placeholder="e.g. Kyoto, Japan" required>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="input-group">
+            <label>Start Date</label>
+            <input type="date" id="trip-start-date" class="custom-input" required>
+          </div>
+          <div class="input-group">
+            <label>End Date</label>
+            <input type="date" id="trip-end-date" class="custom-input" required>
+          </div>
+        </div>
+        <div class="input-group">
+          <label>Estimated Total Budget ($)</label>
+          <input type="number" id="trip-total-budget" class="custom-input" placeholder="1500" min="0" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="margin-top: 0.5rem; width: 100%;">Create Trip Plan ✈️</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE CREATE TRIP WIZARD MODAL -->
+  <div class="modal-overlay" id="wizard-modal">
+    <div class="modal-card" style="max-width: 640px;">
+      <button class="modal-close" class="close-modal-btn">&times;</button>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <div>
+          <h2 style="font-size: 1.7rem;" id="wizard-step-title">Step 1: Trip Basics</h2>
+          <p style="color: var(--text-muted); font-size: 0.85rem;" id="wizard-step-sub">Set your trip title, location, and description.</p>
+        </div>
+        <span class="status-pill badge-purple" id="wizard-step-pill">Step 1 of 3</span>
+      </div>
+
+      <!-- Step Progress Bar -->
+      <div style="height: 6px; background: var(--bg-dark); border-radius: var(--radius-full); overflow: hidden; margin-bottom: 1.5rem;">
+        <div id="wizard-progress-bar" style="height: 100%; width: 33.3%; background: linear-gradient(90deg, var(--primary-cyan), var(--accent-pink)); transition: width 0.3s ease;"></div>
+      </div>
+
+      <form id="wizard-form">
+        <!-- WIZARD STEP 1 -->
+        <div id="wizard-step-1" class="wizard-step-panel">
+          <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <div class="input-group">
+              <label>Trip Name</label>
+              <input type="text" id="wiz-trip-name" class="custom-input" placeholder="e.g. Summer Alpine Trek 2026" required>
+            </div>
+            <div class="input-group">
+              <label>Destination / Location</label>
+              <input type="text" id="wiz-location" class="custom-input" placeholder="e.g. Zermatt, Switzerland" required>
+            </div>
+            <div class="input-group">
+              <label>Trip Description & Notes</label>
+              <textarea id="wiz-description" class="custom-input" rows="3" placeholder="Glacier skiing, panoramic train rides, and fondue evenings..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- WIZARD STEP 2 -->
+        <div id="wizard-step-2" class="wizard-step-panel hidden">
+          <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+              <div class="input-group">
+                <label>Start Date</label>
+                <input type="date" id="wiz-start-date" class="custom-input">
+              </div>
+              <div class="input-group">
+                <label>End Date</label>
+                <input type="date" id="wiz-end-date" class="custom-input">
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+              <div class="input-group">
+                <label>Estimated Total Budget ($)</label>
+                <input type="number" id="wiz-budget" class="custom-input" placeholder="2500" min="0">
+              </div>
+              <div class="input-group">
+                <label>Number of Stops / Cities</label>
+                <input type="number" id="wiz-stops" class="custom-input" value="1" min="1">
+              </div>
+            </div>
+            <div class="input-group">
+              <label>Initial Status</label>
+              <select id="wiz-status" class="custom-input">
+                <option value="upcoming">🗓️ Upcoming</option>
+                <option value="ongoing">🚀 Ongoing</option>
+                <option value="completed">✅ Completed</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- WIZARD STEP 3: COVER PHOTO PICKER -->
+        <div id="wizard-step-3" class="wizard-step-panel hidden">
+          <label style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem; display: block;">Select Cover Photo</label>
+          
+          <!-- Preset Photo Grid -->
+          <div id="wizard-preset-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; margin-bottom: 1rem;">
+            <!-- Rendered dynamically -->
+          </div>
+
+          <div class="input-group">
+            <label>Or Custom Image URL</label>
+            <input type="url" id="wiz-custom-photo-url" class="custom-input" placeholder="https://images.unsplash.com/photo-...">
+          </div>
+        </div>
+
+        <!-- Wizard Navigation Footer -->
+        <div style="display: flex; justify-content: space-between; margin-top: 1.75rem; border-top: 1px solid var(--border-glass); padding-top: 1rem;">
+          <button type="button" class="btn btn-glass" id="wiz-back-btn" style="visibility: hidden;">← Back</button>
+          <button type="button" class="btn btn-primary" id="wiz-next-btn">Next Step →</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- EDIT TRIP MODAL -->
+  <div class="modal-overlay" id="edit-trip-modal">
+    <div class="modal-card">
+      <button class="modal-close" class="close-modal-btn">&times;</button>
+      <h2 style="font-size: 1.7rem; margin-bottom: 0.25rem;">✏️ Edit Trip Details</h2>
+      <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.25rem;">Update dates, budget, stops, or status.</p>
+
+      <form id="edit-trip-form" style="display: flex; flex-direction: column; gap: 0.85rem;">
+        <input type="hidden" id="edit-trip-id">
+        <div class="input-group">
+          <label>Trip Name</label>
+          <input type="text" id="edit-trip-name" class="custom-input" required>
+        </div>
+        <div class="input-group">
+          <label>Location</label>
+          <input type="text" id="edit-trip-location" class="custom-input" required>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+          <div class="input-group">
+            <label>Start Date</label>
+            <input type="date" id="edit-start-date" class="custom-input" required>
+          </div>
+          <div class="input-group">
+            <label>End Date</label>
+            <input type="date" id="edit-end-date" class="custom-input" required>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem;">
+          <div class="input-group">
+            <label>Budget ($)</label>
+            <input type="number" id="edit-trip-budget" class="custom-input" min="0">
+          </div>
+          <div class="input-group">
+            <label>Stops</label>
+            <input type="number" id="edit-trip-stops" class="custom-input" min="1">
+          </div>
+          <div class="input-group">
+            <label>Status</label>
+            <select id="edit-trip-status" class="custom-input">
+              <option value="upcoming">Upcoming</option>
+              <option value="ongoing">Ongoing</option>
+              <option value="completed">Completed</option>
+            </select>
+          </div>
+        </div>
+        <div class="input-group">
+          <label>Cover Photo URL</label>
+          <input type="url" id="edit-trip-photo" class="custom-input">
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="margin-top: 0.5rem; width: 100%;">Save Trip Changes 💾</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- SHARE TRIP MODAL -->
+  <div class="modal-overlay" id="share-trip-modal">
+    <div class="modal-card">
+      <button class="modal-close" class="close-modal-btn">&times;</button>
+      <h2 style="font-size: 1.6rem; margin-bottom: 0.25rem;">🔗 Share Trip Plan</h2>
+      <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.25rem;">Anyone with this unique link can view your trip plan.</p>
+
+      <div style="background: rgba(7, 10, 19, 0.6); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1.25rem;">
+        <label style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase;">Public Share Link</label>
+        <input type="text" id="share-link-input" class="custom-input" readonly style="margin-top: 0.35rem; background: transparent; font-family: monospace;">
+      </div>
+
+      <button class="btn btn-accent" id="copy-share-url-btn" style="width: 100%;">📋 Copy Shareable Link</button>
+    </div>
+  </div>
+
+  <!-- ADD CITY TO TRIP MODAL (From Explorer) -->
+  <div class="modal-overlay" id="add-city-to-trip-modal">
+    <div class="modal-card">
+      <button class="modal-close" class="close-modal-btn">&times;</button>
+      <h2 style="font-size: 1.7rem; margin-bottom: 0.25rem;" id="add-city-modal-title">📍 Add City to Trip</h2>
+      <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.25rem;">Select one of your existing trips to add this city as a stop.</p>
+
+      <form id="add-city-to-trip-form" style="display: flex; flex-direction: column; gap: 1rem;">
+        <input type="hidden" id="add-city-name-hidden">
+        <input type="hidden" id="add-city-country-hidden">
+        
+        <div class="input-group">
+          <label>Select Target Trip</label>
+          <select id="user-trips-select" class="custom-input" required>
+            <!-- User trips injected dynamically -->
+          </select>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+          <div class="input-group">
+            <label>Arrival Date</label>
+            <input type="date" id="add-city-arrival" class="custom-input" required>
+          </div>
+          <div class="input-group">
+            <label>Departure Date</label>
+            <input type="date" id="add-city-departure" class="custom-input" required>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label>Stay Duration (Days)</label>
+          <input type="number" id="add-city-stay-days" class="custom-input" value="3" min="1" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Add Stop to Itinerary ✈️</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ASSIGN ACTIVITY MODAL -->
+  <div class="modal-overlay" id="add-activity-modal">
+    <div class="modal-card">
+      <button class="modal-close" class="close-modal-btn">&times;</button>
+      <h2 style="font-size: 1.7rem; margin-bottom: 0.25rem;">🎟️ Assign Activity to Itinerary</h2>
+      <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.25rem;">Set timing, duration, location, and cost tags.</p>
+
+      <form id="assign-activity-form" style="display: flex; flex-direction: column; gap: 0.85rem;">
+        <div class="input-group">
+          <label>Activity Title</label>
+          <input type="text" id="act-title" class="custom-input" placeholder="e.g. Guided Louvre Museum Tour" required>
+        </div>
+        <div class="input-group">
+          <label>Location / Venue</label>
+          <input type="text" id="act-location" class="custom-input" placeholder="e.g. Rue de Rivoli, Paris">
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem;">
+          <div class="input-group">
+            <label>Day #</label>
+            <input type="number" id="act-day" class="custom-input" value="1" min="1" required>
+          </div>
+          <div class="input-group">
+            <label>Time Slot</label>
+            <input type="text" id="act-time" class="custom-input" placeholder="09:00 AM">
+          </div>
+          <div class="input-group">
+            <label>Duration</label>
+            <input type="text" id="act-duration" class="custom-input" placeholder="2.5 hours">
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+          <div class="input-group">
+            <label>Estimated Cost ($)</label>
+            <input type="number" id="act-cost" class="custom-input" placeholder="45" min="0">
+          </div>
+          <div class="input-group">
+            <label>Category</label>
+            <select id="act-category" class="custom-input">
+              <option value="Sightseeing">Sightseeing</option>
+              <option value="Dining">Dining</option>
+              <option value="Transport">Transport</option>
+              <option value="Wellness">Wellness</option>
+              <option value="Culture">Culture</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-accent" style="width: 100%;">Assign Activity 🚀</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ACTIVITY DETAIL PREVIEW MODAL -->
+  <div class="modal-overlay" id="activity-detail-modal">
+    <div class="modal-card" style="max-width: 620px;">
+      <button class="modal-close" class="close-modal-btn">&times;</button>
+      <div id="activity-modal-content">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- INLINE SCHEDULED TIME EDIT MODAL -->
+  <div class="modal-overlay" id="edit-time-modal">
+    <div class="modal-card">
+      <button class="modal-close" class="close-modal-btn">&times;</button>
+      <h2 style="font-size: 1.6rem; margin-bottom: 0.25rem;">⏰ Edit Scheduled Time Slot</h2>
+      <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.25rem;">Quickly adjust activity time slot and duration.</p>
+
+      <form id="edit-time-form" style="display: flex; flex-direction: column; gap: 0.85rem;">
+        <input type="hidden" id="edit-time-act-id">
+        <div class="input-group">
+          <label>Scheduled Time Slot</label>
+          <input type="text" id="edit-time-slot" class="custom-input" placeholder="e.g. 09:30 AM" required>
+        </div>
+        <div class="input-group">
+          <label>Duration</label>
+          <input type="text" id="edit-time-duration" class="custom-input" placeholder="e.g. 2 hours">
+        </div>
+        <div class="input-group">
+          <label>Day Number</label>
+          <input type="number" id="edit-time-day" class="custom-input" min="1" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="margin-top: 0.5rem; width: 100%;">Save Time Schedule ⏰</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- DESTINATION DETAIL MODAL -->
+  <div class="modal-overlay" id="dest-detail-modal">
+    <div class="modal-card" style="max-width: 680px;">
+      <button class="modal-close" class="close-modal-btn">&times;</button>
+      <div id="dest-modal-content">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container"></div>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>
